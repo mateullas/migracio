@@ -17,11 +17,12 @@
     <module>component</module>
     <module>federating</module>
     <module>imsent</module>
-    <module>jldap</module>
-    <module>jldap-mock</module>
-    <module>userdetail</module>
-    <module>kerberos</module>
-    <module>openldap</module>
+    <!--  <module>jldap</module> -->
+    <module>unboundid</module>
+    <!-- <module>jldap-mock</module>  -->
+    <!-- <module>userdetail</module>  -->
+    <!-- <module>kerberos</module>   -->
+    <!-- <module>openldap</module>   -->
     <module>sample</module>
   </modules>
 
@@ -73,6 +74,11 @@
         <artifactId>sakai-jldap-provider-mock</artifactId>
         <version>${project.version}</version>
 <!-- <scope>test</scope> removed to fix build - Chuck -->
+      </dependency>
+       <dependency>
+         <groupId>org.sakaiproject</groupId>
+         <artifactId>sakai-unboundid-provider</artifactId>
+         <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
