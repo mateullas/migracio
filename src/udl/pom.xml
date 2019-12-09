@@ -14,9 +14,9 @@
     <packaging>pom</packaging>
 	
 	<modules>
-		<!-- <module>datacollector</module>
+		<!-- <module>datacollector</module> -->
 		<module>directori</module>
-		<module>actes</module>
+		<!-- <module>actes</module>
 		<module>enquestes</module>
 		<module>helpdesk</module>
 		<module>reports</module> -->
