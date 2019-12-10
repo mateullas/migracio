@@ -21,7 +21,7 @@
 		<module>helpdesk</module>
 		<module>reports</module> -->
 		<module>cm</module>
-		<!-- <module>udl-jobs</module> -->
+		<module>udl-jobs</module>
 	</modules>    
     
 </project>
