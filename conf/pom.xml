@@ -234,6 +234,10 @@
 											<token>TOKEN_FORCE_URL</token>
 											<value>${sakai.config.server.forceurl}</value>
 										</replacement>
+										<replacement>
+											<token>TOKEN_EXPEDIENT_URL</token>
+											<value>${sakai.config.expedient.url}</value>
+										</replacement>
 
 										<replacement>
 											<token>TOKEN-DATACOLLECTOR-SECTIONS-PATH</token>
