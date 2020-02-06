@@ -17,9 +17,10 @@
 		<module>datacollector</module> 
 		<module>directori</module>
 		<module>helpdesk</module>
+		<module>reports</module>
 		<!-- <module>actes</module>
 		<module>enquestes</module>		
-		<module>reports</module> -->
+		 -->
 		<module>cm</module>
 		<module>udl-jobs</module>
 	</modules>    
