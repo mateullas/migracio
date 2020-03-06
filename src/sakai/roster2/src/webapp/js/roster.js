@@ -28,15 +28,19 @@
             var button = $(this);
 
             button.prop('disabled', true);
+			$('.roster-print-button').prepend ('<span class="spincircle fa fa-circle-o-notch fa-spin"></span>');
+
 
             e.preventDefault();
-            roster.renderMembership({renderAll: true, callback: function () {
+            roster.renderMembership({renderAll: true,forceOfficialPicture: roster.officialPictureMode,
+            	callback: function () {
 
                     var container = roster.picturesMode ? $('#roster-members-content') : $('#roster-members');
 
                     container.waitForImages(function () {
 
                         button.prop('disabled', false);
+						$('.spincircle').remove();
                         window.print();
                     });
                 }
@@ -832,18 +836,32 @@
     };
 
     // jquery.i18n
-    $.i18n.properties({
-        name:'ui',
-        path:'/sakai-roster2-tool/i18n/',
-        mode: 'both',
-        async: true,
-        checkAvailableLanguages: true,
-        language: roster.language,
-        callback: function () {
-            roster.loadSiteDataAndInit();
-        }
-    });
+//    $.i18n.properties({
+//        name:'ui',
+//        path:'/sakai-roster2-tool/i18n/',
+//        mode: 'both',
+//        async: true,
+//        checkAvailableLanguages: true,
+//        language: roster.language,
+//        callback: function () {
+//            roster.loadSiteDataAndInit();
+//        }
+//    });
 
+	  $(document).ready(function () {
+			$.i18n.properties({
+			        name:'ui',
+	        		path:'/sakai-roster2-tool/i18n/',
+	        		mode: 'both',
+	        		async: true,
+	        		checkAvailableLanguages: true,
+	        		language: roster.language,
+	        		callback: function () {
+	            			roster.loadSiteDataAndInit();
+	        		}
+	    		});
+		  });
+	  
     roster.alignMobileLabels = function () {
 
         if (!roster.maxMobileLabelWidth) {

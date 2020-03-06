@@ -641,6 +641,15 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 		rosterMember.setDisplayName(user.getDisplayName());
 		rosterMember.setSortName(user.getSortName());
 
+		String propDNI = user.getProperties().getProperty("dni");
+		String dni = "";
+
+		if (propDNI !=null){
+			dni = propDNI;
+		}
+		rosterMember.setDni (dni);
+
+		
 		Map<String, String> userPropertiesMap = new HashMap<>();
 		ResourceProperties props = user.getProperties();
 

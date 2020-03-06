@@ -72,6 +72,8 @@ public class RosterMember {
 	private String enrollmentStatusText;
 	@Getter @Setter
 	private String credits;	
+	@Getter @Setter
+	private String dni;
 	@Getter
 	private Map<String, String> groups = new HashMap<String, String>();
 	@Getter @Setter

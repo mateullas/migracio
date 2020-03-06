@@ -461,6 +461,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		for (final RosterMember member : rosterMembers) {
 
 			final List<String> row = new ArrayList<String>();
+			
+			row.add (member.getDni());
 
 			if (this.sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
@@ -591,6 +593,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		final ResourceLoader rl = new ResourceLoader("org.sakaiproject.roster.i18n.ui");
 
 		final List<String> header = new ArrayList<>();
+		header.add("DNI");
 		header.add(rl.getString("facet_name"));
 
 		if (this.sakaiProxy.getViewUserDisplayId()) {
