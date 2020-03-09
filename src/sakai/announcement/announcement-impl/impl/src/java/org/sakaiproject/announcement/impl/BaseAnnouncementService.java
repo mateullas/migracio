@@ -103,6 +103,10 @@ import org.sakaiproject.util.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.sakaiproject.db.api.SqlService;
+import java.sql.Connection;
+
+
 /**
  * <p>
  * BaseAnnouncementService extends the BaseMessage for the specifics of Announcement.
@@ -179,6 +183,21 @@ public abstract class BaseAnnouncementService extends BaseMessage implements Ann
 	{
 		m_notificationService = service;
 	}
+
+	/** Dependency: SqlService */
+	protected SqlService m_sqlService = null;
+
+	/**
+	 * Dependency: SqlService.
+	 * 
+	 * @param service
+	 *        The SqlService.
+	 */
+	public void setSqlService(SqlService service)
+	{
+		m_sqlService = service;
+	}
+
 
 	/**********************************************************************************************************************************************************************************************************************************************************
 	 * Init and Destroy
@@ -1991,4 +2010,76 @@ public abstract class BaseAnnouncementService extends BaseMessage implements Ann
 	public void clearMessagesCache(String channelRef){
 		m_threadLocalManager.set(channelRef + ".msgs", null);
 	}
+	
+
+	// saves entity references for App notifications
+	public void saveReferenceToPush(String reference) {
+		saveEntityToSendApp(reference);
+	}
+
+	// delete entity reference for App notifications
+	public void deleteReferenceToPush(String reference){
+		deleteEntityToSendApp(reference);
+	}
+
+	protected void saveEntityToSendApp(String entityReference) {
+
+			log.debug("Save entity ref. to ENTITY_TO_PUSH table");
+			String tableName = "ENTITY_TO_PUSH";
+
+			try {
+					// get a connection
+					final Connection connection = m_sqlService.borrowConnection();
+					boolean wasCommit = connection.getAutoCommit();
+					connection.setAutoCommit(false);
+
+					String insert = "insert into "+tableName+" VALUES('"+entityReference+"')";
+					boolean success = m_sqlService.dbWrite(insert);
+					if (!success) 
+					{
+						log.warn("Save entity ref. to table: failed");
+					}
+					connection.commit();
+					connection.setAutoCommit(wasCommit);
+					m_sqlService.returnConnection(connection);
+
+			}
+			catch (Throwable t)
+			{
+				log.warn("Save entity ref. to table: failed: " + t);
+			}
+
+			log.debug("Save entity ref. to table: done");
+
+	}
+
+	protected void deleteEntityToSendApp(String entityReference) {
+
+		log.debug("Delete entity ref. from ENTITY_TO_PUSH table");
+		String tableName = "ENTITY_TO_PUSH";
+
+		try {
+			// get a connection
+			final Connection connection = m_sqlService.borrowConnection();
+			boolean wasCommit = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			String delete = "delete from "+tableName+" where ENTITYREFERENCE = '"+entityReference+"'";
+			boolean success = m_sqlService.dbWrite(delete);
+			if (!success) 
+			{
+				log.warn("Delete entity ref. from table: failed");
+			}
+			connection.commit();
+			connection.setAutoCommit(wasCommit);
+			m_sqlService.returnConnection(connection);
+		}
+		catch (Throwable t)
+		{
+			log.warn("Delete entity ref. from table: failed: " + t);
+		}
+
+		log.debug("Delete entity ref. from table: done");
+	}
+
 }

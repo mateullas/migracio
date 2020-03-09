@@ -155,6 +155,8 @@ public class AnnouncementAction extends PagedResourceActionII
 	private static final String DELETE_STATUS = "deleteAnnouncement";
 
 	private static final String SSTATE_NOTI_VALUE = "noti_value";
+	
+	private static final String SSTATE_SENDAPP_VALUE = "sendapp_value";
 
 	private static final String SSTATE_PUBLICVIEW_VALUE = "public_view_value";
 
@@ -258,6 +260,7 @@ public class AnnouncementAction extends PagedResourceActionII
    
    private CourseManagementService courseManagementService;
 
+   private boolean sendApp = false;
 
 
     public AnnouncementAction() {
@@ -2162,6 +2165,13 @@ public class AnnouncementAction extends PagedResourceActionII
 
 				context.put("allowAddChannelMessage", new Boolean(channel.allowAddChannelMessage()));
 
+				Site site = SiteService.getSite(channel.getContext());
+				ResourceProperties siteProperties = site.getProperties();
+				if (siteProperties.getProperty("pushSender").equals("true")){
+					sendApp = true;
+					context.put("sendApp",sendApp);
+				}
+
 				String announceTo = state.getTempAnnounceTo();
 				if (announceTo != null && announceTo.length() != 0)
 				{
@@ -2814,6 +2824,7 @@ public class AnnouncementAction extends PagedResourceActionII
 
 		sstate.setAttribute(AnnouncementAction.SSTATE_PUBLICVIEW_VALUE, null);
 		sstate.setAttribute(AnnouncementAction.SSTATE_NOTI_VALUE, null);
+		sstate.setAttribute(AnnouncementAction.SSTATE_SENDAPP_VALUE, null);
 
 		// disable auto-updates while in view mode
 		disableObservers(sstate);
@@ -2998,6 +3009,11 @@ public class AnnouncementAction extends PagedResourceActionII
 		// read the notification options & save it in session state
 		String notification = rundata.getParameters().getString("notify");
 		sstate.setAttribute(AnnouncementAction.SSTATE_NOTI_VALUE, notification);
+
+		// read sendApp notification option & save it in session state
+		String sendAppChecked = params.getString("sendApp");
+		log.debug("Llegim si l'usuari vol enviar via App Mobil: "+sendAppChecked);
+		sstate.setAttribute(AnnouncementAction.SSTATE_SENDAPP_VALUE, sendAppChecked);
 
 	} // readAnnouncementForm
 
@@ -3268,6 +3284,13 @@ public class AnnouncementAction extends PagedResourceActionII
 							accessChanged = true;
 						}
 					}
+					String sendAppChecked = (String) sstate.getAttribute(AnnouncementAction.SSTATE_SENDAPP_VALUE);
+					log.debug("Cal enviar la notificació via AppMobil? "+sendAppChecked);	
+					if (sendAppChecked.equals("true")) {
+						log.debug("Cridem el servei per desar "+msg.getReference());	
+						log.debug("Id del missatge "+msg.getId());
+						AnnouncementService.saveReferenceToPush(msg.getReference());
+					}
 				}
 				catch (PermissionException e)
 				{
@@ -3433,6 +3456,9 @@ public class AnnouncementAction extends PagedResourceActionII
 					//AnnouncementMessageEdit edit = channel.editAnnouncementMessage(message.getId());
 					//channel.removeMessage(edit); 
 					channel.removeAnnouncementMessage(message.getId());
+
+					if (log.isDebugEnabled()) log.debug("AppMobil: Eliminem la referència "+message.getReference());
+					AnnouncementService.deleteReferenceToPush(message.getReference());	
 
 					// make sure auto-updates are enabled
 					enableObservers(sstate);

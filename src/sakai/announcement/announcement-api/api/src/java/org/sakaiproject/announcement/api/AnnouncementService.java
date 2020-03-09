@@ -197,4 +197,12 @@ public interface AnnouncementService extends MessageService
 	 */
 	public List getMessages(String channelReference, Filter filter, boolean order, boolean merged) throws IdUnusedException, PermissionException, NullPointerException;
 	
+	// saves entity references for App notifications
+	public void saveReferenceToPush(String reference);
+
+	// delete entity references for App notifications
+	public void deleteReferenceToPush(String reference);
+	
 }
+
+

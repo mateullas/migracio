@@ -76,18 +76,12 @@ public class DbAnnouncementService extends BaseAnnouncementService
 	 * Constructors, Dependencies and their setter methods
 	 *********************************************************************************************************************************************************************************************************************************************************/
 
-	/** Dependency: SqlService */
-	protected SqlService m_sqlService = null;
+	private SqlService m_sqlService;
 
-	/**
-	 * Dependency: SqlService.
-	 * 
-	 * @param service
-	 *        The SqlService.
-	 */
-	public void setSqlService(SqlService service)
-	{
-		m_sqlService = service;
+	public void setSqlService(
+		org.sakaiproject.db.api.SqlService sqlService) {
+			this.m_sqlService = sqlService;
+			super.setSqlService(sqlService);
 	}
 
 	/**
