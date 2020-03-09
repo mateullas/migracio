@@ -32,15 +32,17 @@
 
 
             e.preventDefault();
-            roster.renderMembership({renderAll: true,forceOfficialPicture: roster.officialPictureMode,
+            roster.renderMembership({
+            	renderAll: true,	
+            	forceOfficialPicture: roster.officialPictureMode,
             	callback: function () {
 
                     var container = roster.picturesMode ? $('#roster-members-content') : $('#roster-members');
 
                     container.waitForImages(function () {
-
-                        button.prop('disabled', false);
-						$('.spincircle').remove();
+                    	$('.spincircle').remove();
+						button.prop('disabled', false);
+                    	
                         window.print();
                     });
                 }
