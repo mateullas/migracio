@@ -2,6 +2,9 @@
 ## edit classes list in course site
 <div class ="portletBody">
 	#if($menu)#toolbar($menu)#end
+	<div>
+		<h4>$tlang.getString("sitedicla.edit_roster_announcement")</h4>
+	</div>
 	<h3>
 		$tlang.getString("sitedicla.edit_roster") <span class="highlight">$!siteTitle</span>
 	</h3>
@@ -31,7 +34,14 @@
 							</label></h5>
 						</td>
 						<td headers="remove" class="screenOnly">
-							<span class="skip">$tlang.getString("sitedicla.rem")</span><input type="checkbox" name="providerClassDeletes" value="$id" id="pcl$providerCourseListNum" onclick="checkEnableRemove();" />
+							<span class="skip">$tlang.getString("sitedicla.rem")</span>
+							##UDL: Hablita o deshabilita checkbox, en funció dels permisos del usuari en cada section
+							##<input type="checkbox" name="providerClassDeletes" value="$id" id="pcl$providerCourseListNum" />
+							#if($!iSectionsIds.contains($id))
+								<input type="checkbox" name="providerClassDeletes"  onclick="checkEnableRemove();" value="$id" id="pcl$providerCourseListNum" #if($!iSectionsSelectedIds && $!iSectionsSelectedIds.contains($id)) checked="checked" #end />	
+							#else
+								<input type="checkbox" name="providerClassDeletes" value="$id" id="pcl$providerCourseListNum" disabled="true"/>	
+							#end
 						</td>
 					</tr>
 				#end
@@ -47,7 +57,7 @@
 							</h5>
 						</td>
 						<td headers="remove" class="screenOnly">
-							<span class="skip">$tlang.getString("sitedicla.rem")</span><input type="checkbox" name="cmRequestedClassDeletes" value="$id.eid" id="cmrcl$cmRequestedCourseListNum" onclick="checkEnableRemove();" />
+							<span class="skip">$tlang.getString("sitedicla.rem")</span><input type="checkbox" name="cmRequestedClassDeletes" onclick="checkEnableRemove();" value="$id.eid" id="cmrcl$cmRequestedCourseListNum" #if($!iSectionsSelectedIds && $!iSectionsSelectedIds.contains($id)) checked="checked" #end />
 						</td>
 					</tr>
 				#end
@@ -63,7 +73,7 @@
 							</h5>
 						</td>
 						<td headers="remove" class="screenOnly">
-							<span class="skip">$tlang.getString("sitedicla.rem")</span><input type="checkbox" name="manualClassDeletes" value="$id" id="mcl$manualCourseListNum" onclick="checkEnableRemove();" />
+							<span class="skip">$tlang.getString("sitedicla.rem")</span><input type="checkbox" onclick="checkEnableRemove();" name="manualClassDeletes" value="$id" id="mcl$manualCourseListNum" />
 						</td>
 					</tr>
 				#end
@@ -75,6 +85,17 @@
 				<input type="hidden" name="templateIndex" value="$!templateIndex" />
 				<input type="submit" accesskey="s" class="active" name="eventSubmit_doContinue" id="btnRemove" disabled="disabled" value="$tlang.getString("sitedicla.remsel")" onclick="SPNR.disableControlsAndSpin( this, null );" />
 				<input type="submit" accesskey="x" name="eventSubmit_doBack" value="$tlang.getString("sitedicla.can")" onclick="SPNR.disableControlsAndSpin( this, null );" />
+				#if($confirmacio)
+					<script>
+						$(document).ready (function () {
+							checkEnableRemove();	
+						});
+					</script>
+
+					<input type="hidden" name="confirmacio" id='conf' value="$confirmacio" />
+				#else
+					<input type="hidden" name="confirmacio" id='conf' value="novalue" />
+				#end
 			</p>
 		
 	#else
