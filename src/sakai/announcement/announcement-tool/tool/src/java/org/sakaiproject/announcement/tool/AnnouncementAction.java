@@ -66,6 +66,9 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.FilePickerHelper;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.cover.ContentTypeImageService;
+import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.coursemanagement.api.Section;
+import org.sakaiproject.coursemanagement.api.exception.IdNotFoundException;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.Entity;
@@ -252,6 +255,9 @@ public class AnnouncementAction extends PagedResourceActionII
 
    
    private static final String DEFAULT_TEMPLATE="announcement/chef_announcements";
+   
+   private CourseManagementService courseManagementService;
+
 
 
     public AnnouncementAction() {
@@ -1268,11 +1274,108 @@ public class AnnouncementAction extends PagedResourceActionII
 				//context.put("groups", groups);
 				Collection<Group> sortedGroups = new ArrayList<>();
 
+				//UDL-MODIF CM-15 Mirem quin tipus d'espai és
+				ResourceProperties rp = site.getProperties();
+				boolean isEspaiCoord = false;
+				Collection cursos = new ArrayList ();
+				Collection assignatures = new ArrayList ();
+				Collection grups = new ArrayList();
+				boolean teConflictesCurs = false;
+				boolean teConflictesAssig = false;
+
+
+				if (rp!=null){
+					String tipusEspai = rp.getProperty("tipus_espai");
+					if (tipusEspai!= null && "espai_comunicacio".equals (tipusEspai)){
+						isEspaiCoord = true;
+					}
+				}
+
+				
 				for (Iterator<Group> i = new SortedIterator(groups.iterator(), new AnnouncementGroupComparator(AnnouncementGroupComparator.Criteria.TITLE, true)); i.hasNext();)
 					{
-						sortedGroups.add(i.next());
+						//sortedGroups.add(i.next());
+						Group thatGroup = (Group) i.next();
+	
+						if (isEspaiCoord){
+							try{
+								Section section = courseManagementService.getSection (thatGroup.getProviderGroupId());
+	
+								//Previament processem per distingis si son cursos, assignatures o grups
+								distributeSectionGroup (thatGroup, cursos, assignatures, grups, section.getCategory());
+								sortedGroups.add(thatGroup);
+							} catch (IdNotFoundException IdNotFound){
+								//Nothing
+								log.warn ("No section for {}", thatGroup.getProviderGroupId());
+							}
+	
+						} else {
+							sortedGroups.add(thatGroup);
+						}
+	
 					}
-				context.put("groups", sortedGroups);
+	
+				//Muntem la estructura a partir dels grups classificats
+				if (isEspaiCoord){
+					//Fiquem tots els cursos al hash per tenir les referencies 
+					HashMap<String,TreeGrupWrap> cursosHash = new HashMap<String,TreeGrupWrap>();
+					HashMap<String,TreeGrupWrap> assigHash = new HashMap<String,TreeGrupWrap> ();
+					HashMap<String,TreeGrupWrap> grupsHash = new HashMap<String,TreeGrupWrap> ();	
+	
+					Iterator iteCurs = cursos.iterator();
+					while (iteCurs.hasNext()){
+						TreeGrupWrap itemActual = (TreeGrupWrap) iteCurs.next();
+						cursosHash.put (itemActual.getCodiCurs(),itemActual);
+
+					}
+				//context.put("groups", sortedGroups);
+					
+
+
+					//Fiquem les assignatures dins del hash d'assignatures i com a subgrup de cada curs
+					Iterator iteAssig = assignatures.iterator();
+					while (iteAssig.hasNext()){
+						TreeGrupWrap itemActual = (TreeGrupWrap) iteAssig.next();
+						assigHash.put (itemActual.getCodiAssignatura(), itemActual);
+						TreeGrupWrap cursAssig = cursosHash.get(itemActual.getCodiCurs());
+						//Si detectem un conflicte (intentar ficar una assignatura en un grup, tanquem i tornem la llista normal
+						if (cursAssig != null) {
+							cursAssig.addChild(itemActual);
+						}else {
+							teConflictesCurs=true;
+						}
+					}
+
+					//Fiquem els grups dins del hash de grups i com a subgrup de cada assignatura
+
+					Iterator iteGrup = grups.iterator();
+					while (iteGrup.hasNext() && !teConflictesAssig){
+						TreeGrupWrap itemActual = (TreeGrupWrap)  iteGrup.next();
+						grupsHash.put (itemActual.getCodiGrup(), itemActual);
+						TreeGrupWrap grupCurs = assigHash.get(itemActual.getCodiAssignatura());
+						if (grupCurs!= null){
+							grupCurs.addChild(itemActual);
+						} else {
+							teConflictesAssig = true;
+						}
+					}
+
+					if (!teConflictesCurs) {
+						if (!teConflictesAssig){
+							sortedGroups = cursos;
+						} 
+					} else {
+						if (!teConflictesAssig){
+							sortedGroups = assignatures;
+						}
+					}
+					context.put("coordgroups",sortedGroups);
+				}else {
+					context.put("groups", sortedGroups);
+				}
+
+				context.put("isEspaiCoord", isEspaiCoord);
+				//context.put("teConflictes", teConflictesCurs);
 			}
 		}
 
@@ -1560,7 +1663,7 @@ public class AnnouncementAction extends PagedResourceActionII
 									channelIdStrArray.add(channeIDD);
 								}
 							} catch(Exception e) {
-								log.warn(e.getMessage());
+								//log.warn(e.getMessage());
 							}
 						}
 						if (channelIdStrArray.size()>0) {
@@ -3994,6 +4097,11 @@ public class AnnouncementAction extends PagedResourceActionII
 		{
 			m_securityService = (SecurityService) ComponentManager.get("org.sakaiproject.authz.api.SecurityService");
 		}
+		
+		if (courseManagementService == null)
+		{
+			courseManagementService = (CourseManagementService) ComponentManager.get("org.sakaiproject.coursemanagement.api.CourseManagementService");
+		}
 
 
 		// retrieve the state from state object
@@ -4853,5 +4961,79 @@ public class AnnouncementAction extends PagedResourceActionII
 	private boolean isMotd(String channelId) {
 		return channelId.endsWith("motd");
 	}
+	
+	private void distributeSectionGroup (Group currentGroup, Collection cursos,Collection assignatures,Collection grups, String category){
+		//Split the category
+		if (category!=null && category.startsWith ("GRUP_ET")){
+
+			//The string received would be something like "GRUP_ET:ET-<codi_pla>...:<codi-curs>
+			String [] parts = category.split(":");
+			String subcode;
+			String curs;
+
+			if (parts.length==3){ // It's a course or a group
+				subcode = parts[1];
+				curs = parts[2];
+
+				//Here we have "ET-PLA-<ASS>-<grup> or "ET-PLA-<ASS> or "ET-PLA"
+				String [] currentCode = subcode.split ("-"); 
+
+				if (currentCode.length == 3) {
+					assignatures.add (new TreeGrupWrap (curs,currentCode[2],null,currentGroup) );
+				}else if (currentCode.length ==4) {
+					grups.add (new TreeGrupWrap (curs,currentCode[2],currentCode[3],currentGroup));
+				}
+
+			}else if (parts.length==2){ //It's a course
+				subcode = "";
+				curs = parts[1];
+				cursos.add (new TreeGrupWrap (curs,null,null,currentGroup));
+			}
+
+		}
+	}
+
+	public class TreeGrupWrap{
+		Group group = null;
+		Collection children=null;
+		String codiCurs=null;
+		String codiAssignatura;
+		String codiGrup;
+
+		public TreeGrupWrap (String codiCurs, String codiAssignatura, String codiGrup, Group group){
+			this.group = group;
+			this.children = new ArrayList ();
+			this.codiAssignatura = codiAssignatura;
+			this.codiCurs = codiCurs;
+			this.codiGrup = codiGrup;
+		}
+
+		public Group getGroup(){
+			return this.group;
+		}
+
+		public String getCodiCurs (){
+			return this.codiCurs;
+		}
+
+		public String getCodiAssignatura (){
+			return this.codiAssignatura;
+		}
+
+		public String getCodiGrup (){
+			return this.codiGrup;
+		}
+
+		public void addChild (TreeGrupWrap child){
+			this.children.add (child);
+		}
+		public Collection getChildren (){
+			return children;
+		}
+		public boolean hasChildren (){
+			return (children.size() > 0);
+		}
+	}
+
 
 }
