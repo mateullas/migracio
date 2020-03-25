@@ -300,9 +300,7 @@ public class ExportPanel extends BasePanel {
 					header.add(String.join(" ", IGNORE_COLUMN_PREFIX, getString("importExport.export.csv.headers.studentNumber")));
 				}
 				if (!isCustomExport || this.includeDNI) {
-					header.add(String.format("%s%s",
-						CUSTOM_EXPORT_COLUMN_PREFIX,
-						getString("importExport.export.csv.headers.DNI")));
+					header.add(String.join(" ", IGNORE_COLUMN_PREFIX, getString("importExport.export.csv.headers.DNI")));
 				}
 
 				// get list of assignments. this allows us to build the columns and then fetch the grades for each student for each assignment from the map
