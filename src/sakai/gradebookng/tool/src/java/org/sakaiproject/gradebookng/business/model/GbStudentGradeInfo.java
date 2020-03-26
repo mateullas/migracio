@@ -84,6 +84,7 @@ public class GbStudentGradeInfo implements Serializable {
 		studentNumber = u.getStudentNumber();
 		grades = new HashMap<>();
 		categoryAverages = new HashMap<>();
+		this.DNI = u.getDNI();
 	}
 
 	public GbStudentGradeInfo(final User u, final String studentNumber) {
