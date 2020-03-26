@@ -82,7 +82,7 @@ public class GbUser implements Serializable, Comparable<GbUser> {
 	}
 
 	public static GbUser forDisplayOnly(final String displayID, final String displayName) {
-		return new GbUser("", displayID, displayName, "", "", "");
+		return new GbUser("", displayID, displayName, "", "", "", "");
 	}
 
 	public boolean isValid() {
