@@ -53,6 +53,9 @@ public class GbUser implements Serializable, Comparable<GbUser> {
 
 	@Getter
 	private final String studentNumber;
+	
+	@Getter
+	private final String DNI;
 
 	public GbUser(final User u) {
 		this(u, "");
@@ -65,19 +68,21 @@ public class GbUser implements Serializable, Comparable<GbUser> {
 		this.firstName = u.getFirstName();
 		this.lastName = u.getLastName();
 		this.studentNumber = studentNumber;
+		this.DNI = (u.getProperties().getProperty("dni") != null) ? u.getProperties().getProperty("dni") : "";
 	}
 
-	public GbUser(final String userUUID, final String displayID, final String displayName, final String firstName, final String lastName, final String studentNumber) {
+	public GbUser(final String userUUID, final String displayID, final String displayName, final String firstName, final String lastName, final String studentNumber, final String DNI) {
 		this.userUuid = userUUID;
 		this.displayId = displayID;
 		this.displayName = displayName;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.studentNumber = studentNumber;
+		this.DNI = DNI;
 	}
 
 	public static GbUser forDisplayOnly(final String displayID, final String displayName) {
-		return new GbUser("", displayID, displayName, "", "", "");
+		return new GbUser("", displayID, displayName, "", "", "", "");
 	}
 
 	public boolean isValid() {

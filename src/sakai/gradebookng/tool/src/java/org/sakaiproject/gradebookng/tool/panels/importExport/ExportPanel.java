@@ -68,6 +68,7 @@ public class ExportPanel extends BasePanel {
 	boolean includeStudentId = true;
 	boolean includeStudentNumber = false;
 	boolean includeStudentDisplayId = false;
+	boolean includeDNI = true;
 	boolean includeGradeItemScores = true;
 	boolean includeGradeItemComments = true;
 	boolean includeCourseGrade = false;
@@ -131,6 +132,15 @@ public class ExportPanel extends BasePanel {
 			public boolean isVisible()
 			{
 				return stuNumVisible;
+			}
+		});
+		add(new AjaxCheckBox("includeDNI", Model.of(this.includeDNI)) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
+				ExportPanel.this.includeDNI = !ExportPanel.this.includeDNI;
+				setDefaultModelObject(ExportPanel.this.includeDNI);
 			}
 		});
 
@@ -289,6 +299,9 @@ public class ExportPanel extends BasePanel {
 				if (isCustomExport && this.includeStudentNumber) {
 					header.add(String.join(" ", IGNORE_COLUMN_PREFIX, getString("importExport.export.csv.headers.studentNumber")));
 				}
+				if (!isCustomExport || this.includeDNI) {
+					header.add(String.join(" ", IGNORE_COLUMN_PREFIX, getString("importExport.export.csv.headers.DNI")));
+				}
 
 				// get list of assignments. this allows us to build the columns and then fetch the grades for each student for each assignment from the map
 				final List<Assignment> assignments = this.businessService.getGradebookAssignments();
@@ -361,6 +374,9 @@ public class ExportPanel extends BasePanel {
 					if (isCustomExport && this.includeStudentNumber)
 					{
 						line.add(studentGradeInfo.getStudentNumber());
+					}
+					if (!isCustomExport || this.includeDNI) {
+						line.add(studentGradeInfo.getDNI());
 					}
 					if (!isCustomExport || this.includeGradeItemScores || this.includeGradeItemComments) {
 						assignments.forEach(assignment -> {
