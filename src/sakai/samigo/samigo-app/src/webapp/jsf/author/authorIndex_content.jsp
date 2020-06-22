@@ -147,7 +147,7 @@ $(document).ready(function() {
     </h1>
 
   <div class="row">
- 	<div id="samigo-create-new-box" class="col-md-6">
+ 	<div id="samigo-create-new-box" class="col-md-5">
 		<div class="lead">
 	  		<h:outputText value="#{authorFrontDoorMessages.assessment_scratch}" rendered="#{authorization.createAssessment}" />
     	</div>

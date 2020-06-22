@@ -952,8 +952,13 @@ function hiddenLinkOnClick(){
         </h:panelGroup>
       </f:facet>
       <!-- display of answer to file upload question is diffenent from other types - daisyf -->
-      <h:outputText value="#{description.answer}" escape="false" rendered="#{questionScores.typeId != '6' && questionScores.typeId != '7' && questionScores.typeId != '5' && questionScores.typeId != '16'}" >
+      <h:outputText value="#{description.answer}" escape="false" rendered="#{questionScores.typeId != '1' and questionScores.typeId != '2' and questionScores.typeId != '9' and questionScores.typeId != '12' and questionScores.typeId != '6' && questionScores.typeId != '7' && questionScores.typeId != '5' && questionScores.typeId != '16'}" >
       	<f:converter converterId="org.sakaiproject.tool.assessment.jsf.convert.AnswerSurveyConverter" />
+      </h:outputText>
+      
+        <%-- Multiple choice, Multiple correct, Multiple single selection and matching questions --%>
+      <h:outputText value="#{description.answer}" escape="false" rendered="#{questionScores.typeId == '1' || questionScores.typeId == '2' || questionScores.typeId == '9' || questionScores.typeId == '12'}">
+          <f:converter converterId="org.sakaiproject.tool.assessment.jsf.convert.AnswerHTMLConverter" />
       </h:outputText>
       
     <h:panelGroup rendered="#{questionScores.selectedSARationaleView == '1' && questionScores.typeId == '5'}">
@@ -1094,7 +1099,12 @@ function hiddenLinkOnClick(){
           </h:commandLink>    
           </h:panelGroup>
       </f:facet>
-	<h:outputText value="#{description.answer}" escape="false" rendered="#{questionScores.typeId != '6' and questionScores.typeId != '7' && questionScores.typeId != '5' and questionScores.typeId != '16'}" />
+	<h:outputText value="#{description.answer}" escape="false" rendered="#{questionScores.typeId != '1' and questionScores.typeId != '2' and questionScores.typeId != '9' and questionScores.typeId != '12' and questionScores.typeId != '6' and questionScores.typeId != '7' && questionScores.typeId != '5' and questionScores.typeId != '16'}" />
+
+    <%-- Multiple choice, Multiple correct, Multiple single selection and matching questions --%>
+    <h:outputText value="#{description.answer}" escape="false" rendered="#{ questionScores.typeId == '1' || questionScores.typeId == '2' || questionScores.typeId == '9' || questionScores.typeId == '12'}">
+        <f:converter converterId="org.sakaiproject.tool.assessment.jsf.convert.AnswerHTMLConverter" />
+    </h:outputText>
 
     <h:panelGroup rendered="#{questionScores.selectedSARationaleView == '1' && questionScores.typeId == '5'}">
     <h:outputText value="#{description.answer}" escape="false"/>

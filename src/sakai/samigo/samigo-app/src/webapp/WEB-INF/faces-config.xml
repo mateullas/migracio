@@ -1488,5 +1488,9 @@
 			org.sakaiproject.tool.assessment.jsf.convert.AnswerSurveyConverter
 		</converter-class>
 	</converter>
+	<converter>
+        <converter-id>org.sakaiproject.tool.assessment.jsf.convert.AnswerHTMLConverter</converter-id>
+        <converter-class>org.sakaiproject.tool.assessment.jsf.convert.AnswerHTMLConverter</converter-class>
+    </converter>
 
 </faces-config>

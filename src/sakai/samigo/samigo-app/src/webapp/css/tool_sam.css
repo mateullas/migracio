@@ -1101,7 +1101,7 @@ td.feedbackColumn2 {
 }
 
 #questionProgressPanel {
-	min-height: 200px;
+	min-height: 220px;
 	max-height:auto;
 	width: 295px;
 	background: #ddd;
@@ -1117,9 +1117,9 @@ div#questionProgressPanel div.tier1 {
 }
 
 #questionProgressClick {
-	height: 200px;
+	height: 220px;
 	width: 40px;
-	background: #004B8D;
+	background: #830051;
 	right:299px;
 	margin-top: 200px;
 	position: fixed;
@@ -1173,7 +1173,7 @@ p.progressItem img {
 .rotateQP {
 	color:white;
 	white-space:nowrap;
-	margin-top:154px;
+	margin-top:185px;
 
 	/* Safari */
 	-webkit-transform: rotate(-90deg);
