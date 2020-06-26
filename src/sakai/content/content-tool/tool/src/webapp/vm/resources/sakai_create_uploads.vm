@@ -1,5 +1,5 @@
 <!-- resources/sakai_create_uploads.vm, use with org.sakaiproject.tool.content.ResourcesHelperAction.java -->
-#css("/library/webjars/dropzone/4.2.0/min/dropzone.min.css")
+#css("/library/webjars/dropzone/5.2.0/min/dropzone.min.css")
 <div class="portletBody specialLink">
     <h3>$tlang.getString("create.uploads")</h3>
     <ol class="breadcrumb">
@@ -140,7 +140,7 @@
         </div>
     </div>
 </div>
-#javascript("/library/webjars/dropzone/4.2.0/min/dropzone.min.js")
+#javascript("/library/webjars/dropzone/5.2.0/dropzone.js")
 <script type="text/javascript">
 Dropzone.options.fileUploader = {
     // do not change these values as the dropzone logic depends on these values
@@ -148,6 +148,11 @@ Dropzone.options.fileUploader = {
     parallelUploads: 1,
     uploadMultiple: false,
     addRemoveLinks: true,
+    editFileName: true,
+    editHtmlElement: "<i id=\"editFileName\" class=\"fa fa-edit\"></i>",
+  	dictEditText: "$tlang.getString("dragndrop.dictEditText")",
+    dictFilenameMaxLength: "245",
+    dictChangeFilenameMessage: "$tlang.getString("dragndrop.dictChangeFilenameMessage")",
     maxFilesize: $uploadMaxSize, // MB
     previewTemplate: document.getElementById('preview-template').innerHTML,
     dictFallbackMessage: "$tlang.getString("dragndrop.dictFallbackMessage")",
@@ -198,6 +203,9 @@ Dropzone.options.fileUploader = {
         this.on("sending", function(file, xhr, formData) {
             var overwrite = document.querySelector('input[name="overwrite"]:checked').value;
             formData.append("overwrite",overwrite);
+            var oldFileName = file.name;
+	    	var newName = document.getElementById(oldFileName).name;
+            file.upload.filename = newName; 
             formData.append("fullPath",file.fullPath);
             #if($model.isDropbox() || $model.isUserSite() || !$availability_is_enabled)
                 formData.append("hidden", false);
